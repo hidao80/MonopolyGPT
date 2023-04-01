@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,12 +8,13 @@
     <title>MonopolyGPT</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
     <form action="c/" method="get">
         <textarea style="width:80%;" rows="40"></textarea>
         <input type="hidden" name="s">
     </form>
-    <button>Convert GPT logs to HTML</button>    
+    <button>Convert GPT logs to HTML</button>
     <script>
         window.onload = () => {
             document.querySelector("textarea").value = `{
@@ -53,7 +55,6 @@
 
                 const outputJson = JSON.stringify(messages);
                 const uriEncodedJson = encodeURIComponent(outputJson);
-                console.debug(uriEncodedJson);
 
                 const postParamS = document.querySelector("input");
                 postParamS.value = uriEncodedJson;
@@ -65,4 +66,5 @@
         };
     </script>
 </body>
+
 </html>

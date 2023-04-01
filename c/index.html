@@ -15,13 +15,14 @@
             --r3: 1.0rem;
             --r4: 1.5rem;
             --r5: 3.0rem;
+            --message-width: 800px;
+            --view-width: calc(100vw - calc(100vw - 100%));
         }
 
         html,
-        body,
-        main {
-            min-width: 100vw;
-            min-height: 100vh;
+        body {
+            width: var(--view-width);
+            height: 100vh;
             margin: 0;
             padding: 0;
         }
@@ -50,10 +51,24 @@
             padding-left: 4px;
             padding-right: 4px;
             white-space: pre-wrap;
-            max-width: 1280px;
             display: flex;
             justify-content: center;
         }
+
+        @media (max-width: 800px) {
+            .message {
+                min-width: 80%;
+                max-width: 80%;
+            }
+        }
+
+        @media (min-width: 800px) {
+            .message {
+                min-width: calc(800px * 0.9);
+                max-width: calc(800px * 0.9);
+            }
+        }
+
 
         .message:first-child {
             margin-top: var(--r5);
@@ -90,30 +105,30 @@
         }
 
         .from {
-            min-width: 70%;
-            padding-top: var(--r4);
+            width: 100%;
             padding-bottom: var(--r4);
             margin: 0;
             margin-left: var(--r4);
-            position: relative;
+            display: flex;
+            flex-flow: column;
+            justify-content: flex-start;
         }
 
         .to {
-            min-width: 70%;
-            padding-top: var(--r4);
+            width: 100%;
             padding-bottom: var(--r4);
             margin: 0;
             margin-left: var(--r4);
             border-color: var(--bg-color-gpt);
-            position: relative;
+            display: flex;
+            flex-flow: column;
+            justify-content: flex-start;
         }
 
         .from>p,
         .to>p {
-            position: absolute;
-            padding: 0;
-            margin: 0;
-            top: 0;
+            margin-top: 0;
+            max-width: 100%;
         }
     </style>
 </head>
@@ -121,7 +136,12 @@
 <body>
     <main>
     </main>
-    <script>
+    <script id="renderer">
+        /**
+         * Parse the message part of JSON in the format sent from ChatGPT CLI and draw it in the main tag.
+         * 
+         * @params {object} message
+         */
         function addPost(message) {
             const main = document.querySelector("main");
             const from = message.from == "human" ? "human" : "gpt";
@@ -130,9 +150,12 @@
 <div class="avatar ${from}"></div>
 <div class="from">
 `;
-            const lines = message.value.split("\n"); 
+            const lines = message.value.split("\\n\\n");
             lines.forEach(v => {
-                post += `<p>${v}</p>\n`;
+                v = v.replaceAll("\\n", "<br>");
+                if (v.length > 0) {
+                    post += `<p>${v}</p>\n`;
+                }
             });
 
             post += "</div></div></div>";
@@ -140,16 +163,22 @@
             main.innerHTML += post;
         }
 
+        // Script to be executed after the DOM has been drawn.
         window.onload = () => {
+            // Obtain query parameters and parse them as JSON.
             const url = new URL(window.location.href);
             const params = url.searchParams;
             const uriEncodedJson = params.get('s');
             const jsonString = decodeURIComponent(uriEncodedJson);
             const json = JSON.parse(jsonString);
 
+            // The acquired array objects are drawn in order.
             json.forEach(message => {
                 addPost(message);
             });
+
+            // After drawing is finished, this script will automatically disappear.
+            document.querySelector("#renderer").remove();
         };
     </script>
 </body>
