@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MnonopolyGPT</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <form action="c/" method="get">
+        <textarea style="width:80%;" rows="40"></textarea>
+        <input type="hidden" name="s">
+    </form>
+    <button>Convert GPT logs to HTML</button>    
+    <script>
+        window.onload = () => {
+            document.querySelector("textarea").value = `{
+  "model": "gpt-3.5-turbo",
+  "messages": [
+    {
+      "role": "user",
+      "content": "こんにちは"
+    },
+    {
+      "role": "assistant",
+      "content": "こんにちは！私はAIアシスタントです。何かお手伝いできることがありますか？"
+    }
+  ],
+  "temperature": 1,
+  "top_p": 1,
+  "n": 1
+}`;
+
+            const button = document.querySelector("button");
+            if (/^en\b/.test(navigator.language)) {
+                button.textContent = 'Convert GPT logs to HTML';
+            } else {
+                button.textContent = 'GPTログをHTMLに変換';
+            }
+
+            button.addEventListener("click", e => {
+                const inputJson = document.querySelector('textarea').value;
+                const json = JSON.parse(inputJson);
+
+                const messages = [];
+                for (const message of json.messages) {
+                    messages.push({
+                        "from": message.role == "user" ? "human" : "gpt",
+                        "value": message.content,
+                    })
+                }
+
+                const outputJson = JSON.stringify(messages);
+                const uriEncodedJson = encodeURIComponent(outputJson);
+                console.debug(uriEncodedJson);
+
+                const postParamS = document.querySelector("input");
+                postParamS.value = uriEncodedJson;
+
+                const form = document.querySelector("form");
+                form.submit();
+                return false;
+            });
+        };
+    </script>
+</body>
+</html>
